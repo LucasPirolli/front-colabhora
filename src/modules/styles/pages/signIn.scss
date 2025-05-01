@@ -1,0 +1,44 @@
+[data-page="signIn"] {
+  display: flex;
+  width: 100%;
+  height: 100vh;
+  .container-form {
+    width: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    > .content-form {
+      height: 500px;
+      border-radius: 8px;
+      padding: 50px;
+      width: 500px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 20px;
+      user-select: none;
+
+      > .title {
+        font-size: 1.75rem;
+        font-weight: 600;
+        color: #112E37;
+      }
+      > .phrase {
+        font-size: 0.875rem;
+        color: #585858;
+      }
+    }
+  }
+  .content-img {
+    width: 50%;
+    display: flex;
+    justify-content: flex-end;
+    align-items: end;
+    max-height: 100%;
+    > img {
+      border-radius: 20px 0 0;
+      height: 90%;
+    }
+  }
+}
