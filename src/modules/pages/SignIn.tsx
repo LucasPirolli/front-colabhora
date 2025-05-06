@@ -1,12 +1,15 @@
-import "../styles/pages/signIn.scss";
-
-import type { FormProps } from "antd";
-import { Button, Checkbox, Form, Input } from "antd";
-
-import Banner from "../../assets/banner-signin.svg";
 import { useState } from "react";
 
+import type { FormProps } from "antd";
+import { Button, Form, Input } from "antd";
+import { useNavigate } from "react-router";
+
+import Banner from "../../assets/banner-signin.svg";
+
+import "../styles/pages/signIn.scss";
+
 function SignIn() {
+  const navigate = useNavigate();
   const [isRegistering, setIsRegistering] = useState(false);
 
   type FieldType = {
@@ -108,6 +111,7 @@ function SignIn() {
                 type="primary"
                 htmlType="submit"
                 style={{ background: "#3F8F56", marginRight: "8px" }}
+                onClick={() => navigate("/home")}
               >
                 {isRegistering ? "Registrar" : "Entrar"}
               </Button>
