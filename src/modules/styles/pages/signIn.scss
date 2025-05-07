@@ -1,3 +1,5 @@
+@use "../base/variables" as *;
+
 [data-page="signIn"] {
   display: flex;
   width: 100%;
@@ -22,7 +24,9 @@
       > .title {
         font-size: 1.75rem;
         font-weight: 600;
-        color: #112E37;
+        color: $main-green;
+        font-family: "Poppins", sans-serif;
+        font-style: italic;
       }
       > .phrase {
         font-size: 0.875rem;
