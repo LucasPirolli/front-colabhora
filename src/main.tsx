@@ -5,19 +5,21 @@ import { createRoot } from "react-dom/client";
 
 import SignIn from "./modules/pages/SignIn.tsx";
 import Home from "./modules/pages/Home.tsx";
+import MyServices from "./modules/pages/MyServices.tsx";
 
 import "./index.scss";
 const Main = () => {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/signin" element={<SignIn />} />
+        <Route path="/" element={<SignIn />} />
+        <Route path="/home" element={<Home />} />
+        <Route path="/my-services" element={<MyServices />} />
       </Routes>
     </Router>
   );
 };
- 
+
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <Main />
