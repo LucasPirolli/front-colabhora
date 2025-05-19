@@ -111,6 +111,7 @@ function SignIn() {
                 type="primary"
                 htmlType="submit"
                 style={{ background: "#3F8F56", marginRight: "8px" }}
+                onClick={() => navigate("/home")}
               >
                 {isRegistering ? "Registrar" : "Entrar"}
               </Button>
