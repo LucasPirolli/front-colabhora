@@ -1,15 +1,15 @@
 import { Option } from "antd/es/mentions";
 import { Button, Input, Select, Row, Col, Space } from "antd";
+import { useNavigate } from "react-router-dom";
 
 import TopBanner from "../components/design/TopBanner";
 import Topbar from "../components/design/Topbar";
 import ServiceCard from "../components/design/ServiceCard";
-import { useNavigate } from "react-router-dom";
 
-const MyServices = () => {
+const Opportunities = () => {
   const navigate = useNavigate();
 
-  const handleNavigate = (data: any) => {
+    const handleNavigate = (data: any) => {
     navigate("/service-details", {
       state: {
         selectedData: data,
@@ -22,17 +22,13 @@ const MyServices = () => {
       <Topbar />
       <TopBanner
         imageUrl="https://dummyimage.com/1900x300/ededed/ededed&text=."
-        text="Meus serviços"
+        text="Oportunidades"
       />
 
       <section className="container-my-services" style={{ padding: "24px" }}>
         <Row gutter={24}>
           <Col xs={24} sm={24} md={6}>
             <Space direction="vertical" size="middle" style={{ width: "100%" }}>
-              <Button type="primary" block style={{ background: "#3F8F56" }}>
-                Novo
-              </Button>
-
               <label>Buscar</label>
               <Input placeholder="Digite para buscar..." />
 
@@ -64,13 +60,13 @@ const MyServices = () => {
                 categories={["Categoria A", "Categoria B", "Categoria C"]}
                 onEdit={() => console.log("Editar")}
                 onDelete={() => console.log("Excluir")}
-                hasActions
+                hasActions={false}
                 onClick={() =>
                   handleNavigate({
-                    title: "Serviço X",
+                    title: "Serviço Y",
                     description:
-                      "Descrição do serviço X. Texto explicando o que o serviço faz.",
-                    categories: ["Categoria A", "Categoria B", "Categoria C"],
+                      "Descrição do serviço Y. Texto explicando o que o serviço faz.",
+                    categories: ["Categoria A"],
                   })
                 }
               />
@@ -81,7 +77,7 @@ const MyServices = () => {
                 categories={["Categoria A"]}
                 onEdit={() => console.log("Editar Y")}
                 onDelete={() => console.log("Excluir Y")}
-                hasActions
+                hasActions={false}
                 onClick={() =>
                   handleNavigate({
                     title: "Serviço Y",
@@ -99,4 +95,4 @@ const MyServices = () => {
   );
 };
 
-export default MyServices;
+export default Opportunities;

@@ -16,6 +16,9 @@ const Topbar = () => {
         <span className="title">ColabHora</span>
       </div>
       <div className="container-actions">
+        <a className="link" onClick={() => navigate("/opportunities")}>
+          Oportunidades
+        </a>
         <a className="link" onClick={() => navigate("/my-services")}>
           Meus serviços
         </a>

@@ -1,12 +1,18 @@
 import React from "react";
 import Typewriter from "typewriter-effect";
+import { ApiFilled, ClockCircleOutlined, HeartFilled } from "@ant-design/icons";
+import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
+
 import Topbar from "../components/design/Topbar";
-import "../styles/pages/home.scss";
 import bannerHome from "../../assets/banner-home.png";
 import bannerParceiros from "../../assets/banner-parcerios.jpg";
-import { ApiFilled, ClockCircleOutlined, HeartFilled } from "@ant-design/icons";
+
+import "../styles/pages/home.scss";
 
 const Home = () => {
+  const navigate = useNavigate();
+
   const destaqueFrases = [
     {
       icon: <ApiFilled />,
@@ -59,7 +65,10 @@ const Home = () => {
               </span>{" "}
               a oportunidades com mais visibilidade e controle.
             </span>
-            <button className="btn-opportunities">
+            <button
+              className="btn-opportunities"
+              onClick={() => navigate("/opportunities")}
+            >
               Ver nossas oportunidades
             </button>
             <span className="paragraph">
@@ -71,31 +80,61 @@ const Home = () => {
           </div>
         </div>
       </div>
+
       <section className="container-informations">
         {destaqueFrases.map((item, index) => (
-          <aside className="item" key={index}>
+          <motion.aside
+            className="item"
+            key={index}
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: index * 0.2 }}
+            viewport={{ once: true, amount: 0.3 }}
+          >
             <div className="container-infos">
               {item.icon}
               <span className="title">{item.title}</span>
             </div>
             <p className="paragraph">{item.description}</p>
-          </aside>
+          </motion.aside>
         ))}
       </section>
-      <section className="container-last-opportunities">
+
+      <motion.section
+        className="container-last-opportunities"
+        initial={{ opacity: 0, y: 50 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.7 }}
+        viewport={{ once: true }}
+      >
         <span className="title">Nossas últimas oportunidades!</span>
         <div className="container-cards">
-          <aside className="card"></aside>
-          <aside className="card"></aside>
-          <aside className="card"></aside>
+          {[1, 2, 3].map((_, i) => (
+            <motion.aside
+              key={i}
+              className="card"
+              initial={{ opacity: 0, scale: 0.95 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.7, delay: i * 0.2 }}
+              viewport={{ once: true }}
+            />
+          ))}
         </div>
-      </section>
-      <section className="container-partners">
+      </motion.section>
+
+      <motion.section
+        className="container-partners"
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        transition={{ duration: 0.8 }}
+        viewport={{ once: true }}
+      >
         <span className="title">
           Algumas das centenas de ONGS que já aprovaram nossa ideia
         </span>
         <img src={bannerParceiros} alt="Banner Parceiros" />
-      </section>
+      </motion.section>
+
       <footer className="footer">
         <div className="footer-container">
           <div className="footer-brand">

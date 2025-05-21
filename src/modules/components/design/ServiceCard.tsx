@@ -1,37 +1,45 @@
-import { Card, Tag, Space, Typography, Row, Col, Button } from "antd";
+import { Card, Tag, Space, Typography, Button } from "antd";
 import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
 
-const { Title, Paragraph } = Typography;
+const { Paragraph } = Typography;
 
 type ServiceCardProps = {
   title: string;
   description: string;
   categories: string[];
+  hasActions: boolean;
   onEdit: () => void;
   onDelete: () => void;
+  onClick?: () => void;
 };
 
 const ServiceCard = ({
   title,
   description,
   categories,
+  hasActions,
   onEdit,
   onDelete,
+  onClick,
 }: ServiceCardProps) => {
   return (
     <Card
       title={title}
       extra={
-        <Space>
-          <Button icon={<EditOutlined />} onClick={onEdit} type="text" />
-          <Button
-            icon={<DeleteOutlined />}
-            onClick={onDelete}
-            type="text"
-            danger
-          />
-        </Space>
+        hasActions ? (
+          <Space>
+            <Button icon={<EditOutlined />} onClick={onEdit} type="text" />
+            <Button
+              icon={<DeleteOutlined />}
+              onClick={onDelete}
+              type="text"
+              danger
+            />
+          </Space>
+        ) : null
       }
+      style={{ cursor: "pointer" }}
+      onClick={onClick}
     >
       <Paragraph>{description}</Paragraph>
 
