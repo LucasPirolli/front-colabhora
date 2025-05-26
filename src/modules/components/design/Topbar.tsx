@@ -12,7 +12,7 @@ const Topbar = () => {
   const menuItems: MenuProps["items"] = [
     {
       key: "profile",
-      label: <span onClick={() => navigate("/adm-skills")}>Meu perfil</span>,
+      label: <span onClick={() => navigate("/profile")}>Meu perfil</span>,
     },
     {
       key: "skills",
