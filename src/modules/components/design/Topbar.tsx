@@ -1,4 +1,4 @@
-import { Avatar } from "antd";
+import { Avatar, Dropdown, MenuProps } from "antd";
 import { UserOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 
@@ -8,6 +8,21 @@ import "../../styles/components/design/topbar.scss";
 
 const Topbar = () => {
   const navigate = useNavigate();
+
+  const menuItems: MenuProps["items"] = [
+    {
+      key: "profile",
+      label: <span onClick={() => navigate("/profile")}>Meu perfil</span>,
+    },
+    {
+      key: "skills",
+      label: <span onClick={() => navigate("/adm-skills")}>Habilidades</span>,
+    },
+    {
+      key: "category",
+      label: <span onClick={() => navigate("/adm-categories")}>Categoria</span>,
+    },
+  ];
 
   return (
     <div className="container-topbar">
@@ -22,13 +37,17 @@ const Topbar = () => {
         <a className="link" onClick={() => navigate("/my-services")}>
           Meus serviços
         </a>
-        <a className="link">Candidaturas</a>
-        <Avatar
-          style={{ backgroundColor: "#112e37", cursor: "pointer" }}
-          icon={<UserOutlined />}
-          size={"small"}
-          onClick={() => navigate("/")}
-        />
+        <a className="link" onClick={() => navigate("/applications")}>
+          Candidaturas
+        </a>
+
+        <Dropdown menu={{ items: menuItems }} placement="bottomRight" arrow>
+          <Avatar
+            style={{ backgroundColor: "#112e37", cursor: "pointer" }}
+            icon={<UserOutlined />}
+            size="small"
+          />
+        </Dropdown>
       </div>
     </div>
   );
