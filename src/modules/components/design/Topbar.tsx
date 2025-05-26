@@ -22,7 +22,9 @@ const Topbar = () => {
         <a className="link" onClick={() => navigate("/my-services")}>
           Meus serviços
         </a>
-        <a className="link">Candidaturas</a>
+        <a className="link" onClick={() => navigate("/applications")}>
+          Candidaturas
+        </a>
         <Avatar
           style={{ backgroundColor: "#112e37", cursor: "pointer" }}
           icon={<UserOutlined />}
