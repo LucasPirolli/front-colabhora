@@ -1,74 +1,130 @@
-import { useState } from "react";
-import { Button, Input, Select, Table, Typography, Space } from "antd";
+import { useEffect, useState } from "react";
+import { Button, Input, Table, Typography, Space, message, Modal } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 
 import Topbar from "../../components/design/Topbar";
+import Toast from "../../components/lib/toast";
+import { authFetch } from "../../services/authFetch";
 
 const { Title } = Typography;
-const { Option } = Select;
+
+interface Skill {
+  id_habilidade: number;
+  nom_habilidade: string;
+}
 
 const Skills = () => {
   const [search, setSearch] = useState("");
-  const [filter1, setFilter1] = useState<string | undefined>();
-  const [filter2, setFilter2] = useState<string | undefined>();
+  const [dataSkills, setDataSkills] = useState<Skill[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [newSkillName, setNewSkillName] = useState<string>("");
+  const [loadingCreate, setLoadingCreate] = useState(false);
+  const [editingSkill, setEditingSkill] = useState<Skill | null>(null); // null = modo criação
+
+  const fetchSkills = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch(`${import.meta.env.VITE_BASE_PATH}/skill`);
+      const data = await response.json();
+
+      if (response.ok && data.result) {
+        setDataSkills(data.result);
+      } else {
+        message.error("Erro ao carregar habilidades.");
+      }
+    } catch (err) {
+      message.error("Erro de conexão com o servidor.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchSkills();
+  }, []);
+
+  const handleSaveSkill = async () => {
+    if (!newSkillName.trim()) {
+      Toast("info", "Digite um nome para a habilidade.");
+      return;
+    }
+
+    setLoadingCreate(true);
+
+    setTimeout(async () => {
+      try {
+        const method = editingSkill ? "PATCH" : "POST";
+        const endpoint = `${import.meta.env.VITE_BASE_PATH}/skill`;
+
+        const body = editingSkill
+          ? {
+              id_habilidade: editingSkill.id_habilidade,
+              nom_habilidade: newSkillName,
+            }
+          : {
+              nom_habilidade: newSkillName,
+            };
+
+        const response = await authFetch(endpoint, {
+          method,
+          body: JSON.stringify(body),
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          Toast(
+            "success",
+            editingSkill
+              ? "Habilidade atualizada com sucesso!"
+              : "Habilidade criada com sucesso!"
+          );
+          setNewSkillName("");
+          setIsModalOpen(false);
+          setEditingSkill(null);
+          fetchSkills();
+        } else {
+          Toast("error", data.message || "Erro ao salvar habilidade.");
+        }
+      } catch (err) {
+        Toast("error", "Erro ao conectar com o servidor.");
+      } finally {
+        setLoadingCreate(false);
+      }
+    }, 1500);
+  };
 
   const columns = [
     {
-      title: "Name (job title)",
-      dataIndex: "name",
-      key: "name",
-    },
-    {
-      title: "Age",
-      dataIndex: "age",
-      key: "age",
-      sorter: (a: any, b: any) => a.age - b.age,
-    },
-    {
-      title: "Nickname",
-      dataIndex: "nickname",
-      key: "nickname",
-    },
-    {
-      title: "Employee",
-      dataIndex: "employee",
-      key: "employee",
-      render: (value: boolean) => (
-        <input type="checkbox" checked={value} readOnly />
+      title: "ID",
+      dataIndex: "id_habilidade",
+      key: "id_habilidade",
+      render: (text: number, record: Skill) => (
+        <Button
+          type="link"
+          onClick={() => {
+            setEditingSkill(record);
+            setNewSkillName(record.nom_habilidade);
+            setIsModalOpen(true);
+          }}
+        >
+          {text}
+        </Button>
       ),
+    },
+    {
+      title: "Nome",
+      dataIndex: "nom_habilidade",
+      key: "nom_habilidade",
+      sorter: (a: Skill, b: Skill) =>
+        a.nom_habilidade.localeCompare(b.nom_habilidade),
     },
   ];
 
-  const data = [
-    {
-      key: "1",
-      name: "Giacomo Guilizzoni\nFounder & CEO",
-      age: 40,
-      nickname: "Peldi",
-      employee: true,
-    },
-    {
-      key: "2",
-      name: "Marco Botton\nTuttofare",
-      age: 38,
-      nickname: "",
-      employee: false,
-    },
-    {
-      key: "3",
-      name: "Mariah Maclachlan\nBetter Half",
-      age: 41,
-      nickname: "Patata",
-      employee: true,
-    },
-    {
-      key: "4",
-      name: "Valerie Liberty\nHead Chef",
-      age: null,
-      nickname: "Val",
-      employee: true,
-    },
-  ];
+  const filteredData = dataSkills.filter((item) =>
+    item.nom_habilidade.toLowerCase().includes(search.toLowerCase())
+  );
 
   return (
     <>
@@ -85,9 +141,11 @@ const Skills = () => {
           <Button
             type="primary"
             icon={<PlusOutlined />}
-            style={{
-              background: "#3F8F56",
-              fontSize: "0.875rem",
+            style={{ background: "#3F8F56", fontSize: "0.875rem" }}
+            onClick={() => {
+              setEditingSkill(null); // modo criação
+              setNewSkillName("");
+              setIsModalOpen(true);
             }}
           >
             Novo
@@ -101,28 +159,42 @@ const Skills = () => {
             onChange={(e) => setSearch(e.target.value)}
             style={{ width: 200 }}
           />
-          <Select
-            placeholder="Filtro 1"
-            value={filter1}
-            onChange={(value) => setFilter1(value)}
-            style={{ width: 150 }}
-          >
-            <Option value="opcao1">Opção 1</Option>
-            <Option value="opcao2">Opção 2</Option>
-          </Select>
-          <Select
-            placeholder="Filtro 2"
-            value={filter2}
-            onChange={(value) => setFilter2(value)}
-            style={{ width: 150 }}
-          >
-            <Option value="categoriaA">Categoria A</Option>
-            <Option value="categoriaB">Categoria B</Option>
-          </Select>
         </Space>
 
-        <Table columns={columns} dataSource={data} pagination={false} />
+        <Table
+          columns={columns}
+          dataSource={filteredData}
+          rowKey="id_habilidade"
+          loading={loading}
+          pagination={false}
+        />
       </div>
+
+      <Modal
+        title={editingSkill ? "Editar Habilidade" : "Nova Habilidade"}
+        open={isModalOpen}
+        onOk={handleSaveSkill}
+        onCancel={() => {
+          setIsModalOpen(false);
+          setEditingSkill(null);
+        }}
+        okText={editingSkill ? "Salvar" : "Criar"}
+        cancelText="Cancelar"
+        destroyOnClose
+        okButtonProps={{
+          style: {
+            backgroundColor: "#3F8F56",
+            borderColor: "#3F8F56",
+          },
+          loading: loadingCreate,
+        }}
+      >
+        <Input
+          placeholder="Nome da habilidade"
+          value={newSkillName}
+          onChange={(e) => setNewSkillName(e.target.value)}
+        />
+      </Modal>
     </>
   );
 };
