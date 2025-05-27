@@ -1,74 +1,130 @@
-import { useState } from "react";
-import { Button, Input, Select, Table, Typography, Space } from "antd";
+import { useEffect, useState } from "react";
+import { Button, Input, Table, Typography, Space, message, Modal } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 
 import Topbar from "../../components/design/Topbar";
+import Toast from "../../components/lib/toast";
+import { authFetch } from "../../services/authFetch";
 
 const { Title } = Typography;
-const { Option } = Select;
+
+interface Category {
+  id_categoria: number;
+  nom_categoria: string;
+}
 
 const Categories = () => {
   const [search, setSearch] = useState("");
-  const [filter1, setFilter1] = useState<string | undefined>();
-  const [filter2, setFilter2] = useState<string | undefined>();
+  const [dataCategories, setDataCategories] = useState<Category[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [newCategoryName, setNewCategoryName] = useState("");
+  const [loadingSave, setLoadingSave] = useState(false);
+  const [editingCategory, setEditingCategory] = useState<Category | null>(null);
+
+  const fetchCategories = async () => {
+    setLoading(true);
+    try {
+      const response = await authFetch(
+        `${import.meta.env.VITE_BASE_PATH}/category`
+      );
+      const data = await response.json();
+
+      if (response.ok && data.result) {
+        setDataCategories(data.result);
+      } else {
+        message.error("Erro ao carregar categorias.");
+      }
+    } catch (err) {
+      message.error("Erro de conexão com o servidor.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchCategories();
+  }, []);
+
+  const handleSaveCategory = async () => {
+    if (!newCategoryName.trim()) {
+      Toast("info", "Digite um nome para a categoria.");
+      return;
+    }
+
+    setLoadingSave(true);
+
+    try {
+      const response = await authFetch(
+        `${import.meta.env.VITE_BASE_PATH}/category`,
+        {
+          method: editingCategory ? "PATCH" : "POST",
+          body: JSON.stringify({
+            nom_categoria: newCategoryName,
+            ...(editingCategory && {
+              id_categoria: editingCategory.id_categoria,
+            }),
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (response.ok) {
+        Toast(
+          "success",
+          editingCategory ? "Categoria atualizada!" : "Categoria criada!"
+        );
+        setNewCategoryName("");
+        setEditingCategory(null);
+        setIsModalOpen(false);
+        fetchCategories();
+      } else {
+        Toast("error", data.message || "Erro ao salvar categoria.");
+      }
+    } catch (err) {
+      Toast("error", "Erro ao conectar com o servidor.");
+    } finally {
+      setLoadingSave(false);
+    }
+  };
+
+  const handleEdit = (category: Category) => {
+    setEditingCategory(category);
+    setNewCategoryName(category.nom_categoria);
+    setIsModalOpen(true);
+  };
 
   const columns = [
     {
-      title: "Name (job title)",
-      dataIndex: "name",
-      key: "name",
-    },
-    {
-      title: "Age",
-      dataIndex: "age",
-      key: "age",
-      sorter: (a: any, b: any) => a.age - b.age,
-    },
-    {
-      title: "Nickname",
-      dataIndex: "nickname",
-      key: "nickname",
-    },
-    {
-      title: "Employee",
-      dataIndex: "employee",
-      key: "employee",
-      render: (value: boolean) => (
-        <input type="checkbox" checked={value} readOnly />
+      title: "ID",
+      dataIndex: "id_categoria",
+      key: "id_categoria",
+      render: (text: number, record: Category) => (
+        <Button
+          type="link"
+          onClick={() => {
+            setEditingCategory(record);
+            setNewCategoryName(record.nom_categoria);
+            setIsModalOpen(true);
+          }}
+        >
+          {text}
+        </Button>
       ),
+    },
+    {
+      title: "Nome",
+      dataIndex: "nom_categoria",
+      key: "nom_categoria",
+      sorter: (a: Category, b: Category) =>
+        a.nom_categoria.localeCompare(b.nom_categoria),
     },
   ];
 
-  const data = [
-    {
-      key: "1",
-      name: "Giacomo Guilizzoni\nFounder & CEO",
-      age: 40,
-      nickname: "Peldi",
-      employee: true,
-    },
-    {
-      key: "2",
-      name: "Marco Botton\nTuttofare",
-      age: 38,
-      nickname: "",
-      employee: false,
-    },
-    {
-      key: "3",
-      name: "Mariah Maclachlan\nBetter Half",
-      age: 41,
-      nickname: "Patata",
-      employee: true,
-    },
-    {
-      key: "4",
-      name: "Valerie Liberty\nHead Chef",
-      age: null,
-      nickname: "Val",
-      employee: true,
-    },
-  ];
+  const filteredData = dataCategories.filter((item) =>
+    item.nom_categoria.toLowerCase().includes(search.toLowerCase())
+  );
 
   return (
     <>
@@ -85,9 +141,11 @@ const Categories = () => {
           <Button
             type="primary"
             icon={<PlusOutlined />}
-            style={{
-              background: "#3F8F56",
-              fontSize: "0.875rem",
+            style={{ background: "#3F8F56", fontSize: "0.875rem" }}
+            onClick={() => {
+              setEditingCategory(null);
+              setNewCategoryName("");
+              setIsModalOpen(true);
             }}
           >
             Novo
@@ -101,28 +159,42 @@ const Categories = () => {
             onChange={(e) => setSearch(e.target.value)}
             style={{ width: 200 }}
           />
-          <Select
-            placeholder="Filtro 1"
-            value={filter1}
-            onChange={(value) => setFilter1(value)}
-            style={{ width: 150 }}
-          >
-            <Option value="opcao1">Opção 1</Option>
-            <Option value="opcao2">Opção 2</Option>
-          </Select>
-          <Select
-            placeholder="Filtro 2"
-            value={filter2}
-            onChange={(value) => setFilter2(value)}
-            style={{ width: 150 }}
-          >
-            <Option value="categoriaA">Categoria A</Option>
-            <Option value="categoriaB">Categoria B</Option>
-          </Select>
         </Space>
 
-        <Table columns={columns} dataSource={data} pagination={false} />
+        <Table
+          columns={columns}
+          dataSource={filteredData}
+          rowKey="id_categoria"
+          loading={loading}
+          pagination={false}
+        />
       </div>
+
+      <Modal
+        title={editingCategory ? "Editar Categoria" : "Nova Categoria"}
+        open={isModalOpen}
+        onOk={handleSaveCategory}
+        onCancel={() => {
+          setIsModalOpen(false);
+          setEditingCategory(null);
+        }}
+        okText={editingCategory ? "Salvar" : "Criar"}
+        cancelText="Cancelar"
+        destroyOnClose
+        okButtonProps={{
+          style: {
+            backgroundColor: "#3F8F56",
+            borderColor: "#3F8F56",
+          },
+          loading: loadingSave,
+        }}
+      >
+        <Input
+          placeholder="Nome da categoria"
+          value={newCategoryName}
+          onChange={(e) => setNewCategoryName(e.target.value)}
+        />
+      </Modal>
     </>
   );
 };

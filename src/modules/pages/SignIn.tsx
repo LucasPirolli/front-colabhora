@@ -122,12 +122,12 @@ function SignIn() {
           if (!token) {
             Toast("error", "Token não encontrado na resposta.");
           } else {
-            Cookies.set("token", token,)
+            Cookies.set("token", token);
             Toast("success", "Login realizado com sucesso!");
 
             setTimeout(() => {
               navigate("/home");
-            }, 1500); 
+            }, 1500);
           }
         }
       }
@@ -235,6 +235,7 @@ function SignIn() {
                         placeholder="Selecione a cidade"
                         disabled={!selectedEstado}
                         loading={!selectedEstado}
+                        allowClear
                       >
                         {cidades.map((cidade) => (
                           <Option
