@@ -1,6 +1,8 @@
 import { StrictMode } from "react";
 
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { ToastContainer } from "react-toastify";
+
 import { createRoot } from "react-dom/client";
 
 import SignIn from "./modules/pages/SignIn.tsx";
@@ -21,15 +23,16 @@ const Main = () => {
   return (
     <Router>
       <Routes>
+        {/* Rota pública */}
         <Route path="/" element={<SignIn />} />
+
+        {/* Rotas protegidas */}
         <Route path="/home" element={<Home />} />
         <Route path="/my-services" element={<MyServices />} />
         <Route path="/opportunities" element={<Opportunities />} />
         <Route path="/service-details" element={<ServiceDetails />} />
         <Route path="/applications" element={<Applications />} />
-
         <Route path="/profile" element={<Profile />} />
-
         <Route path="/adm-skills" element={<Skills />} />
         <Route path="/adm-categories" element={<Categories />} />
       </Routes>
@@ -39,6 +42,7 @@ const Main = () => {
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
+    <ToastContainer />
     <Main />
   </StrictMode>
 );
