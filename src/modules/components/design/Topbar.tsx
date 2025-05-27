@@ -1,8 +1,10 @@
 import { Avatar, Dropdown, MenuProps } from "antd";
 import { UserOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
+import Cookies from "js-cookie";
 
 import Logo from "../../../assets/logo.png";
+import Toast from "../lib/toast";
 
 import "../../styles/components/design/topbar.scss";
 
@@ -22,7 +24,20 @@ const Topbar = () => {
       key: "category",
       label: <span onClick={() => navigate("/adm-categories")}>Categoria</span>,
     },
+    {
+      key: "logout",
+      label: <span onClick={() => handleLogout()}>Sair</span>,
+    },
   ];
+
+  const handleLogout = () => {
+    Cookies.remove("token");
+    Toast("info", "Logout realizado com sucesso!");
+
+    setTimeout(() => {
+      navigate("/");
+    }, 1000);
+  };
 
   return (
     <div className="container-topbar">
