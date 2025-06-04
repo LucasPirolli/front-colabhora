@@ -2,7 +2,6 @@ import { Card, Tag, Space, Typography, Button } from "antd";
 import {
   EditOutlined,
   DeleteOutlined,
-  EyeOutlined,
   CloseCircleOutlined,
   InfoCircleOutlined,
 } from "@ant-design/icons";

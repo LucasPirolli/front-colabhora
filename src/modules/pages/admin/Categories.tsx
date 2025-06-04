@@ -89,11 +89,11 @@ const Categories = () => {
     }
   };
 
-  const handleEdit = (category: Category) => {
-    setEditingCategory(category);
-    setNewCategoryName(category.nom_categoria);
-    setIsModalOpen(true);
-  };
+  // const handleEdit = (category: Category) => {
+  //   setEditingCategory(category);
+  //   setNewCategoryName(category.nom_categoria);
+  //   setIsModalOpen(true);
+  // };
 
   const columns = [
     {

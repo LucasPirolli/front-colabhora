@@ -1,4 +1,3 @@
-import React from "react";
 import Typewriter from "typewriter-effect";
 import { ApiFilled, ClockCircleOutlined, HeartFilled } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
