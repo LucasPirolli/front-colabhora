@@ -1,7 +1,7 @@
 import { Avatar, Dropdown, MenuProps } from "antd";
 import { UserOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
-import Cookies from "js-cookie";
+  import Cookies from 'universal-cookie';
 
 import Logo from "../../../assets/logo.png";
 import Toast from "../lib/toast";
@@ -9,6 +9,7 @@ import Toast from "../lib/toast";
 import "../../styles/components/design/topbar.scss";
 
 const Topbar = () => {
+  const cookies = new Cookies();
   const navigate = useNavigate();
 
   const menuItems: MenuProps["items"] = [
@@ -31,7 +32,7 @@ const Topbar = () => {
   ];
 
   const handleLogout = () => {
-    Cookies.remove("token");
+    cookies.remove("token", { path: "/" });
     Toast("info", "Logout realizado com sucesso!");
 
     setTimeout(() => {

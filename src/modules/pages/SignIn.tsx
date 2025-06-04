@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Button, Form, Input, Select, Row, Col, message } from "antd";
 import { useNavigate } from "react-router";
-import Cookies from "js-cookie";
+import Cookies from "universal-cookie";
 
 import Banner from "../../assets/banner-signin.svg";
 import Toast from "../components/lib/toast";
@@ -10,6 +10,7 @@ import "../styles/pages/signIn.scss";
 const { Option } = Select;
 
 function SignIn() {
+  const cookies = new Cookies();
   const navigate = useNavigate();
   const [isRegistering, setIsRegistering] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -122,7 +123,7 @@ function SignIn() {
           if (!token) {
             Toast("error", "Token não encontrado na resposta.");
           } else {
-            Cookies.set("token", token);
+            cookies.set("token", token);
             Toast("success", "Login realizado com sucesso!");
 
             setTimeout(() => {
