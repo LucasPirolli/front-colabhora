@@ -2,12 +2,13 @@ import { useEffect, useState } from "react";
 import { Button, Form, Input, Select, Row, Col, message } from "antd";
 import { useNavigate } from "react-router";
 import Cookies from "universal-cookie";
+import { jwtDecode } from "jwt-decode";
+const { Option } = Select;
 
 import Banner from "../../assets/banner-signin.svg";
 import Toast from "../components/lib/toast";
 
 import "../styles/pages/signIn.scss";
-const { Option } = Select;
 
 function SignIn() {
   const cookies = new Cookies();
@@ -22,6 +23,13 @@ function SignIn() {
   const [selectedEstado, setSelectedEstado] = useState<string | undefined>();
 
   const [form] = Form.useForm();
+
+
+  interface MyJwtPayload {
+    flg_tipo_usuario: string;
+    id_usuario: number;
+  }
+
 
   useEffect(() => {
     if (isRegistering) {
@@ -123,7 +131,12 @@ function SignIn() {
           if (!token) {
             Toast("error", "Token não encontrado na resposta.");
           } else {
+            const decoded = jwtDecode<MyJwtPayload>(token);
             cookies.set("token", token);
+            cookies.set("flg_tipo_usuario", decoded?.flg_tipo_usuario);
+            cookies.set("id_usuario", decoded?.id_usuario);
+
+
             Toast("success", "Login realizado com sucesso!");
 
             setTimeout(() => {
@@ -134,6 +147,7 @@ function SignIn() {
       }
     } catch (err) {
       Toast("error", "Erro inesperado ao fazer login.");
+      console.error("Erro ao fazer login:", err);
     } finally {
       setLoading(false);
     }

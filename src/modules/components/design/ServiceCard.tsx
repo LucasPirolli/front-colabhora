@@ -1,9 +1,10 @@
-import { Card, Tag, Space, Typography, Button } from "antd";
+import { Card, Tag, Space, Typography, Button, Spin } from "antd";
 import {
   EditOutlined,
   DeleteOutlined,
   CloseCircleOutlined,
   InfoCircleOutlined,
+  CheckCircleOutlined,
 } from "@ant-design/icons";
 
 const { Paragraph } = Typography;
@@ -20,6 +21,8 @@ type ServiceCardProps = {
   onViewDetails?: () => void;
   onWithdraw?: () => void;
   onCheckStatus?: () => void;
+  onAccept?: () => void;
+  acceptLoading?: boolean;
 };
 
 const ServiceCard = ({
@@ -33,8 +36,29 @@ const ServiceCard = ({
   onClick,
   onWithdraw,
   onCheckStatus,
+  onAccept,
+  acceptLoading = false,
 }: ServiceCardProps) => {
   const renderActions = () => {
+    if (onAccept) {
+      return (
+        <Space>
+          <Button
+            icon={acceptLoading ? <Spin size="small" /> : <CheckCircleOutlined />}
+            onClick={(e) => {
+              e.stopPropagation();
+              if (!acceptLoading) {
+                onAccept?.();
+              }
+            }}
+            type="text"
+            style={{ color: "#52c41a" }}
+            disabled={acceptLoading}
+          />
+        </Space>
+      );
+    }
+
     if (isApplicationView) {
       return (
         <Space>
