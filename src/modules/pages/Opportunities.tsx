@@ -10,34 +10,13 @@ import Cookies from "universal-cookie";
 import { authFetch } from "../services/authFetch";
 import { Spin } from "antd";
 import Toast from "../components/lib/toast";
-
-
-interface Opportunity {
-  id_servico: number;
-  nom_servico: string;
-  desc_servico: string;
-  id_usuario_solicitante: number;
-  id_projeto_pai: number | null;
-  nom_projeto: string | null;
-  dth_servico: string;
-  dth_fim_servico: string;
-  num_tempo_estimado: number;
-  num_qtd_prestadores: number;
-  id_status: number;
-  nom_usuario: string;
-  cod_email_usuario: string;
-  id_cidade: number;
-  desc_endereco: string;
-  nom_status: string;
-  num_qtd_prestadores_confirmados: number;
-}
-
+import { Services } from "../../types/types";
 
 const Opportunities = () => {
   const navigate = useNavigate();
   const cookies = new Cookies();
 
-  const [dataOpportunities, setDataOpportunities] = useState<Opportunity[]>([]);
+  const [dataOpportunities, setDataOpportunities] = useState<Services[]>([]);
   const [loading, setLoading] = useState(false);
   const [loadingAcceptId, setLoadingAcceptId] = useState<number | null>(null);
 
@@ -83,7 +62,7 @@ const Opportunities = () => {
     }
   };
 
-  const handleNavigate = (data: Opportunity) => {
+  const handleNavigate = (data: Services) => {
     navigate("/service-details", {
       state: {
         selectedData: data,

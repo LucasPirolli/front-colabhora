@@ -1,7 +1,6 @@
+import { useState } from "react";
 import { Card, Tag, Space, Typography, Button, Spin } from "antd";
 import {
-  EditOutlined,
-  DeleteOutlined,
   CloseCircleOutlined,
   InfoCircleOutlined,
   CheckCircleOutlined,
@@ -15,8 +14,9 @@ type ServiceCardProps = {
   categories: string[];
   hasActions?: boolean;
   isApplicationView?: boolean;
-  onEdit?: () => void;
-  onDelete?: () => void;
+  status?: string;
+  onFinished?: () => Promise<void> | void;
+  onCancel?: () => Promise<void> | void;
   onClick?: () => void;
   onViewDetails?: () => void;
   onWithdraw?: () => void;
@@ -31,14 +31,20 @@ const ServiceCard = ({
   categories,
   hasActions = false,
   isApplicationView = false,
-  onEdit,
-  onDelete,
+  status,
+  onFinished,
+  onCancel,
   onClick,
   onWithdraw,
   onCheckStatus,
   onAccept,
   acceptLoading = false,
 }: ServiceCardProps) => {
+  const [actionLoading, setActionLoading] = useState<Record<"finalize" | "cancel", boolean>>({
+    finalize: false,
+    cancel: false,
+  });
+
   const renderActions = () => {
     if (onAccept) {
       return (
@@ -87,21 +93,41 @@ const ServiceCard = ({
       return (
         <Space>
           <Button
-            icon={<EditOutlined />}
-            onClick={(e) => {
+            icon={actionLoading.finalize ? <Spin size="small" /> : <CheckCircleOutlined />}
+            onClick={async (e) => {
               e.stopPropagation();
-              onEdit?.();
+              if (!actionLoading.finalize && onFinished) {
+                setActionLoading((prev) => ({ ...prev, finalize: true }));
+                try {
+                  await onFinished();
+                } finally {
+                  setActionLoading((prev) => ({ ...prev, finalize: false }));
+                }
+              }
             }}
             type="text"
+            style={{ color: "#3f8f56" }}
+            disabled={actionLoading.finalize}
           />
           <Button
-            icon={<DeleteOutlined />}
-            onClick={(e) => {
+            icon={actionLoading.cancel ? <Spin size="small" /> : <CloseCircleOutlined />}
+            onClick={async (e) => {
               e.stopPropagation();
-              onDelete?.();
+              if (status === "Cancelado" || actionLoading.cancel || !onCancel) return;
+              setActionLoading((prev) => ({ ...prev, cancel: true }));
+              try {
+                await onCancel();
+              } finally {
+                setActionLoading((prev) => ({ ...prev, cancel: false }));
+              }
             }}
             type="text"
             danger
+            disabled={status === "Cancelado" || actionLoading.cancel}
+            style={{
+              cursor: status === "Cancelado" ? "not-allowed" : "pointer",
+              opacity: status === "Cancelado" ? 0.4 : 1,
+            }}
           />
         </Space>
       );
