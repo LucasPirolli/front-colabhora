@@ -9,7 +9,6 @@ import { useEffect, useState } from "react";
 import Cookies from "universal-cookie";
 import { authFetch } from "../services/authFetch";
 import { Spin } from "antd";
-import { toast } from "react-toastify";
 import Toast from "../components/lib/toast";
 
 
@@ -77,11 +76,19 @@ const Opportunities = () => {
       } else {
         message.error("Erro ao carregar oportunidades.");
       }
-    } catch (err: any) {
-      message.error("Erro de conexão.", err);
+    } catch (err) {
+      console.error("Erro ao buscar oportunidades:", err);
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleNavigate = (data: Opportunity) => {
+    navigate("/service-details", {
+      state: {
+        selectedData: data,
+      },
+    });
   };
 
   const handleAcceptService = async (id_servico: number) => {
@@ -104,12 +111,13 @@ const Opportunities = () => {
         fetchOpportunities();
       } else {
         const errorData = await response.json();
-        Toast('error', errorData.message || "Erro ao aceitar o serviço.");
+        Toast('error', errorData?.error || "Erro ao aceitar o serviço.");
       }
     } catch (err) {
       Toast('error', "Erro de conexão.");
+      console.error("Erro ao aceitar serviço:", err);
     } finally {
-      setLoadingAcceptId(null); 
+      setLoadingAcceptId(null);
     }
   };
 
@@ -118,14 +126,6 @@ const Opportunities = () => {
   useEffect(() => {
     fetchOpportunities()
   }, []);
-
-  const handleNavigate = (data: any) => {
-    navigate("/service-details", {
-      state: {
-        selectedData: data,
-      },
-    });
-  };
 
   return (
     <>
@@ -191,13 +191,7 @@ const Opportunities = () => {
                     categories={[item.nom_status, item.nom_usuario]}
                     onAccept={() => handleAcceptService(item.id_servico)}
                     acceptLoading={loadingAcceptId === item.id_servico}
-                    onClick={() =>
-                      handleNavigate({
-                        title: item.nom_servico,
-                        description: item.desc_servico,
-                        categories: [item.nom_status],
-                      })
-                    }
+                    onClick={() => handleNavigate(item)}
                   />
 
                 ))}
