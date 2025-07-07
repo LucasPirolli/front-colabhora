@@ -26,8 +26,6 @@ const Profile = () => {
 
   const [estados, setEstados] = useState<any[]>([]);
   const [cidades, setCidades] = useState<any[]>([]);
-  const [usuario, setUsuario] = useState<any>(null);
-  const [estadoSelecionado, setEstadoSelecionado] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
   const [isFormTouched, setIsFormTouched] = useState(false);
   const [initialValues, setInitialValues] = useState<any>({});
@@ -66,9 +64,7 @@ const Profile = () => {
       );
       const data = await res.json();
       const info = data.result[0];
-      setUsuario(info);
 
-      // Buscar todas cidades e identificar o estado relacionado
       const cidadeRes = await authFetch(`${import.meta.env.VITE_BASE_PATH}/city`);
       const todasCidades = (await cidadeRes.json()).result || [];
       const cidadeUsuario = todasCidades.find(
@@ -77,7 +73,6 @@ const Profile = () => {
       const estadoId = cidadeUsuario?.id_estado;
 
       if (estadoId) {
-        setEstadoSelecionado(estadoId);
         await fetchCidades(estadoId);
       }
 
@@ -99,7 +94,6 @@ const Profile = () => {
   };
 
   const handleChangeEstado = async (id_estado: number) => {
-    setEstadoSelecionado(id_estado);
     await fetchCidades(id_estado);
     form.setFieldsValue({ id_cidade: undefined });
   };

@@ -1,5 +1,5 @@
 // Novo componente para modal de criação de serviço
-import { Modal, Form, Input, DatePicker, Select, InputNumber, Button, Spin, Row, Col } from "antd";
+import { Modal, Form, Input, DatePicker, Select, InputNumber, Button, Row, Col } from "antd";
 import { useEffect, useState } from "react";
 import locale from "antd/es/date-picker/locale/pt_BR";
 import Cookies from "universal-cookie";

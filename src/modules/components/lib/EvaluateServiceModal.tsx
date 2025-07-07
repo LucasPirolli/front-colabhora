@@ -14,7 +14,6 @@ export type EvaluateServiceModalProps = {
 
 const EvaluateServiceModal = ({
   visible,
-  onClose,
   onSubmit,
   idServico,
   usuariosParaAvaliar,
@@ -22,7 +21,7 @@ const EvaluateServiceModal = ({
   const [form] = Form.useForm();
 
   console.log('usuariosParaAvaliar', usuariosParaAvaliar);
-  
+
 
   useEffect(() => {
     if (visible) {
@@ -47,7 +46,7 @@ const EvaluateServiceModal = ({
       title="Avaliar Prestadores"
       open={visible}
       footer={null}
-      onCancel={() => {}}
+      onCancel={() => { }}
       maskClosable={false}
       closable={false}
       destroyOnClose
@@ -83,7 +82,7 @@ const EvaluateServiceModal = ({
         ))}
 
         <Form.Item>
-          <Button type="primary" htmlType="submit" block>
+          <Button type="primary" htmlType="submit" style={{ background: "#3F8F56" }} block>
             Enviar Avaliação
           </Button>
         </Form.Item>
