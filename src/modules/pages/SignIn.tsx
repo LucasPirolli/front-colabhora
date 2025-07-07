@@ -9,6 +9,10 @@ import Banner from "../../assets/banner-signin.svg";
 import Toast from "../components/lib/toast";
 
 import "../styles/pages/signIn.scss";
+interface MyJwtPayload {
+  flg_tipo_usuario: string;
+  id_usuario: number;
+}
 
 function SignIn() {
   const cookies = new Cookies();
@@ -21,14 +25,10 @@ function SignIn() {
   const [habilidades, setHabilidades] = useState<any[]>([]);
 
   const [selectedEstado, setSelectedEstado] = useState<string | undefined>();
+  const [tipoUsuario, setTipoUsuario] = useState<string>("PF");
+
 
   const [form] = Form.useForm();
-
-
-  interface MyJwtPayload {
-    flg_tipo_usuario: string;
-    id_usuario: number;
-  }
 
 
   useEffect(() => {
@@ -80,7 +80,16 @@ function SignIn() {
 
     try {
       if (isRegistering) {
-        const { estado_id, ...body } = allValues;
+        const { estado_id, flg_tipo_usuario, ...bodyBase } = allValues;
+
+        const body = {
+          ...bodyBase,
+          flg_tipo_usuario,
+          id_habilidade_lista:
+            flg_tipo_usuario === "PJ" ? [] : allValues.id_habilidade_lista || [],
+          desc_area_atuacao:
+            flg_tipo_usuario === "PJ" ? allValues.desc_area_atuacao : undefined,
+        };
 
         const response = await fetch(`${import.meta.env.VITE_BASE_PATH}/user`, {
           method: "POST",
@@ -184,9 +193,11 @@ function SignIn() {
                   </Col>
                   <Col span={12}>
                     <Form.Item
-                      label="CPF"
+                      label={tipoUsuario === "PJ" ? "CNPJ" : "CPF"}
                       name="cod_cadastro"
-                      rules={[{ required: true, message: "Digite o CPF" }]}
+                      rules={[
+                        { required: true, message: `Digite o ${tipoUsuario === "PJ" ? "CNPJ" : "CPF"}` },
+                      ]}
                     >
                       <Input />
                     </Form.Item>
@@ -280,7 +291,10 @@ function SignIn() {
                       name="flg_tipo_usuario"
                       rules={[{ required: true, message: "Selecione o tipo" }]}
                     >
-                      <Select placeholder="Selecione o tipo">
+                      <Select
+                        placeholder="Selecione o tipo"
+                        onChange={(value) => setTipoUsuario(value)}
+                      >
                         <Option value="PF">Pessoa Física</Option>
                         <Option value="PJ">Pessoa Jurídica</Option>
                       </Select>
@@ -288,28 +302,38 @@ function SignIn() {
                   </Col>
 
                   <Col span={12}>
-                    <Form.Item
-                      label="Habilidades"
-                      name="id_habilidade_lista"
-                      rules={[
-                        { required: true, message: "Selecione as habilidades" },
-                      ]}
-                    >
-                      <Select
-                        mode="multiple"
-                        placeholder="Selecione habilidades"
+                    {tipoUsuario === "PF" ? (
+                      <Form.Item
+                        label="Habilidades"
+                        name="id_habilidade_lista"
+                        rules={[
+                          { required: true, message: "Selecione as habilidades" },
+                        ]}
                       >
-                        {habilidades.map((habilidade) => (
-                          <Option
-                            key={habilidade.id_habilidade}
-                            value={habilidade.id_habilidade}
-                          >
-                            {habilidade.nom_habilidade}
-                          </Option>
-                        ))}
-                      </Select>
-                    </Form.Item>
+                        <Select mode="multiple" placeholder="Selecione habilidades">
+                          {habilidades.map((habilidade) => (
+                            <Option
+                              key={habilidade.id_habilidade}
+                              value={habilidade.id_habilidade}
+                            >
+                              {habilidade.nom_habilidade}
+                            </Option>
+                          ))}
+                        </Select>
+                      </Form.Item>
+                    ) : (
+                      <Form.Item
+                        label="Área de Atuação"
+                        name="desc_area_atuacao"
+                        rules={[
+                          { required: true, message: "Informe a área de atuação" },
+                        ]}
+                      >
+                        <Input placeholder="Ex: Engenharia, Marketing, Consultoria..." />
+                      </Form.Item>
+                    )}
                   </Col>
+
                 </Row>
               </>
             )}

@@ -11,6 +11,7 @@ import {
 } from "antd";
 import { useEffect, useState } from "react";
 import Cookies from "universal-cookie";
+import isEqual from "lodash.isequal";
 
 import Topbar from "../components/design/Topbar";
 import { authFetch } from "../services/authFetch";
@@ -26,13 +27,16 @@ const Profile = () => {
 
   const [estados, setEstados] = useState<any[]>([]);
   const [cidades, setCidades] = useState<any[]>([]);
+  const [habilidades, setHabilidades] = useState<any[]>([]);
+  const [usuario, setUsuario] = useState<any>(null);
+  const [initialValues, setInitialValues] = useState<any>(null);
+  const [isFormChanged, setIsFormChanged] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [isFormTouched, setIsFormTouched] = useState(false);
-  const [initialValues, setInitialValues] = useState<any>({});
 
   useEffect(() => {
     fetchEstados();
-    fetchUsuario();
+    fetchHabilidades();
+    fetchUsuarioCompleto();
   }, []);
 
   const fetchEstados = async () => {
@@ -45,57 +49,72 @@ const Profile = () => {
     }
   };
 
-  const fetchCidades = async (id_estado: number) => {
+  const fetchHabilidades = async () => {
     try {
-      const res = await authFetch(
-        `${import.meta.env.VITE_BASE_PATH}/city?id_estado=${id_estado}`
-      );
+      const res = await authFetch(`${import.meta.env.VITE_BASE_PATH}/skill`);
       const data = await res.json();
-      setCidades(data.result || []);
+      setHabilidades(data.result || []);
     } catch {
-      message.error("Erro ao carregar cidades.");
+      message.error("Erro ao carregar habilidades.");
     }
   };
 
-  const fetchUsuario = async () => {
+  const fetchUsuarioCompleto = async () => {
     try {
-      const res = await authFetch(
-        `${import.meta.env.VITE_BASE_PATH}/user?id_usuario=${userId}`
-      );
-      const data = await res.json();
-      const info = data.result[0];
+      const [resUsuario, todasCidadesRes, habsUsuario] = await Promise.all([
+        authFetch(`${import.meta.env.VITE_BASE_PATH}/user?id_usuario=${userId}`),
+        authFetch(`${import.meta.env.VITE_BASE_PATH}/city`),
+        authFetch(`${import.meta.env.VITE_BASE_PATH}/user/skills?id_usuario=${userId}`),
+      ]);
 
-      const cidadeRes = await authFetch(`${import.meta.env.VITE_BASE_PATH}/city`);
-      const todasCidades = (await cidadeRes.json()).result || [];
-      const cidadeUsuario = todasCidades.find(
+      const usuarioData = await resUsuario.json();
+      const cidadesData = await todasCidadesRes.json();
+      const habsData = await habsUsuario.json();
+
+      const info = usuarioData.result[0];
+      const cidadeUsuario = cidadesData.result.find(
         (c: any) => c.id_cidade === info.id_cidade
       );
+
       const estadoId = cidadeUsuario?.id_estado;
+      const cidadesDoEstado = cidadesData.result.filter(
+        (c: any) => c.id_estado === estadoId
+      );
 
-      if (estadoId) {
-        await fetchCidades(estadoId);
-      }
+      setCidades(cidadesDoEstado); 
 
-      const formValues = {
+      const habilidadesIds = habsData.result.map((h: any) => h.id_habilidade);
+      setUsuario(info);
+
+      const valoresIniciais = {
         nom_usuario: info.nom_usuario,
         cod_email_usuario: info.cod_email_usuario,
         cod_cadastro: info.cod_cadastro,
         desc_endereco: info.desc_endereco,
         id_estado: estadoId,
         id_cidade: info.id_cidade,
-        id_habilidade_lista: [],
+        id_habilidade_lista: habilidadesIds,
       };
 
-      form.setFieldsValue(formValues);
-      setInitialValues(formValues);
+      form.setFieldsValue(valoresIniciais);
+      setInitialValues(valoresIniciais);
     } catch {
       message.error("Erro ao carregar dados do usuário.");
     }
   };
 
+
   const handleChangeEstado = async (id_estado: number) => {
-    await fetchCidades(id_estado);
-    form.setFieldsValue({ id_cidade: undefined });
+    try {
+      const res = await authFetch(
+        `${import.meta.env.VITE_BASE_PATH}/city?id_estado=${id_estado}`
+      );
+      const data = await res.json();
+      setCidades(data.result || []);
+      form.setFieldsValue({ id_cidade: undefined });
+    } catch {
+      message.error("Erro ao carregar cidades.");
+    }
   };
 
   const handleSubmit = async (values: any) => {
@@ -120,8 +139,8 @@ const Profile = () => {
 
       if (res.ok) {
         Toast("success", "Perfil atualizado com sucesso!");
-        setIsFormTouched(false);
-        fetchUsuario();
+        setIsFormChanged(false);
+        fetchUsuarioCompleto();
       } else {
         Toast("error", data.error || "Erro ao atualizar perfil.");
       }
@@ -132,19 +151,9 @@ const Profile = () => {
     }
   };
 
-  const checkFormChanges = () => {
-    const currentValues = form.getFieldsValue();
-    const hasChanges = Object.keys(initialValues).some((key) => {
-      const initial = initialValues[key];
-      const current = currentValues[key];
-
-      if (Array.isArray(initial) && Array.isArray(current)) {
-        return initial.sort().join(",") !== current.sort().join(",");
-      }
-
-      return initial !== current;
-    });
-    setIsFormTouched(hasChanges);
+  const handleFormChange = () => {
+    const current = form.getFieldsValue();
+    setIsFormChanged(!isEqual(current, initialValues));
   };
 
   return (
@@ -158,8 +167,16 @@ const Profile = () => {
             layout="vertical"
             form={form}
             onFinish={handleSubmit}
-            onValuesChange={checkFormChanges}
+            onValuesChange={handleFormChange}
           >
+            <Row style={{ marginBottom: 16 }}>
+              <Col>
+                <Typography.Text strong>Saldo de horas disponível: </Typography.Text>
+                <Typography.Text type="success">
+                  {usuario?.num_saldo_horas_st}
+                </Typography.Text>
+              </Col>
+            </Row>
             <Row gutter={16}>
               <Col span={12}>
                 <Form.Item
@@ -235,6 +252,25 @@ const Profile = () => {
                   </Select>
                 </Form.Item>
               </Col>
+
+              <Col span={24}>
+                <Form.Item
+                  name="id_habilidade_lista"
+                  label="Habilidades"
+                  rules={[{ required: false }]}
+                >
+                  <Select
+                    mode="multiple"
+                    placeholder="Selecione suas habilidades"
+                  >
+                    {habilidades.map((hab: any) => (
+                      <Option key={hab.id_habilidade} value={hab.id_habilidade}>
+                        {hab.nom_habilidade}
+                      </Option>
+                    ))}
+                  </Select>
+                </Form.Item>
+              </Col>
             </Row>
 
             <Form.Item>
@@ -242,8 +278,8 @@ const Profile = () => {
                 type="primary"
                 htmlType="submit"
                 loading={loading}
-                disabled={!isFormTouched}
-                style={{ background: isFormTouched ? "#3F8F56" : "#c8c8c8" }}
+                disabled={!isFormChanged}
+                style={{ background: isFormChanged ? "#3F8F56" : "#c8c8c8" }}
               >
                 Salvar
               </Button>

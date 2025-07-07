@@ -8,6 +8,7 @@ export interface Services {
   dth_servico: string;
   dth_fim_servico: string;
   num_tempo_estimado: number;
+  num_tempo_estimado_st: string;
   num_qtd_prestadores: number;
   id_status: number;
   nom_usuario: string;

@@ -6,17 +6,10 @@ import Topbar from "../components/design/Topbar";
 import TopBanner from "../components/design/TopBanner";
 import ServiceCard from "../components/design/ServiceCard";
 import { authFetch } from "../services/authFetch";
-
-interface Service {
-  id_servico: number;
-  nom_servico: string;
-  desc_servico: string;
-  nom_status: string;
-  nom_usuario: string;
-}
+import { Services } from "../../types/types";
 
 const Applications = () => {
-  const [services, setServices] = useState<Service[]>([]);
+  const [services, setServices] = useState<Services[]>([]);
   const [loading, setLoading] = useState(false);
 
   const cookies = new Cookies();
@@ -72,7 +65,7 @@ const Applications = () => {
                   key={item.id_servico}
                   title={item.nom_servico}
                   description={item.desc_servico}
-                  categories={[item.nom_status, item.nom_usuario]}
+                  categories={[item.nom_status, item.nom_usuario, new Date(item.dth_servico).toLocaleString("pt-BR"), item.num_tempo_estimado_st]}
                 />
               ))}
             </Space>

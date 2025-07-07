@@ -5,6 +5,7 @@ import locale from "antd/es/date-picker/locale/pt_BR";
 import Cookies from "universal-cookie";
 import { authFetch } from "../../services/authFetch";
 import Toast from "./toast";
+import dayjs from "dayjs";
 
 const { TextArea } = Input;
 const { Option } = Select;
@@ -74,8 +75,8 @@ const CreateServiceModal = ({ visible, onClose, onSuccess, isPJ }: {
                 nom_servico: values.nom_servico,
                 desc_servico: values.desc_servico,
                 id_usuario_solicitante: userId,
-                dth_servico: values.dth_servico.toISOString(),
-                dth_fim_servico: values.dth_fim_servico.toISOString(),
+                dth_servico: dayjs(values.dth_servico).format("YYYY-MM-DDTHH:mm:ss"),
+                dth_fim_servico: dayjs(values.dth_fim_servico).format("YYYY-MM-DDTHH:mm:ss"),
                 num_qtd_prestadores: values.num_qtd_prestadores,
                 id_habilidade_lista: values.id_habilidade_lista,
                 id_categoria_lista: values.id_categoria_lista,
@@ -151,8 +152,9 @@ const CreateServiceModal = ({ visible, onClose, onSuccess, isPJ }: {
                         >
                             <DatePicker
                                 style={{ width: "100%" }}
-                                format="DD/MM/YYYY"
+                                format="DD/MM/YYYY HH:mm:ss"
                                 locale={locale}
+                                showTime
                             />
                         </Form.Item>
                     </Col>
@@ -164,8 +166,9 @@ const CreateServiceModal = ({ visible, onClose, onSuccess, isPJ }: {
                         >
                             <DatePicker
                                 style={{ width: "100%" }}
-                                format="DD/MM/YYYY"
+                                format="DD/MM/YYYY HH:mm:ss"
                                 locale={locale}
+                                showTime
                             />
                         </Form.Item>
                     </Col>

@@ -71,14 +71,13 @@ const ServiceCard = ({
               }
               onClick={(e) => {
                 e.stopPropagation();
-                if (isLocked || acceptLoading || !onFinished) return;
                 if (!acceptLoading) {
                   onAccept?.();
                 }
               }}
               type="text"
-              style={{ color: "#52c41a", cursor: isLocked ? "not-allowed" : "pointer", opacity: isLocked ? 0.4 : 1 }}
-              disabled={acceptLoading}
+              style={{ color: "#52c41a", cursor: isLocked ? "not-allowed" : "pointer", opacity: isLocked ? "0.4" : "1" }}
+              disabled={acceptLoading || isLocked}
             />
           </Tooltip>
         </Space>

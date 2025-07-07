@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 
 import Topbar from "../components/design/Topbar";
-import bannerHome from "../../assets/banner-home.png";
+import bannerHome from "../../assets/image.png";
 import bannerParceiros from "../../assets/banner-parcerios.jpg";
 
 import "../styles/pages/home.scss";
@@ -71,6 +71,11 @@ const Home = () => {
         className="container-banner"
         style={{
           backgroundImage: `linear-gradient(-225deg, rgba(0, 78, 146, 0.65) 0%, rgba(0, 7, 41, 0.65) 20%), url(${bannerHome})`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
+          width: "100%",
+          minHeight: "65vh",
         }}
       >
         <div className="content">
@@ -110,6 +115,7 @@ const Home = () => {
           </div>
         </div>
       </div>
+
 
       <section className="container-informations">
         {destaqueFrases.map((item, index) => (

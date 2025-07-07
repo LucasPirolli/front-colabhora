@@ -124,7 +124,7 @@ const MyServices = () => {
       const endpoint = `${import.meta.env.VITE_BASE_PATH}/service/rate`;
 
       const response = await authFetch(endpoint, {
-        method: "POST",
+        method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
@@ -153,7 +153,7 @@ const MyServices = () => {
   };
 
   const tipoUsuario = cookies.get("flg_tipo_usuario");
-  
+
   useEffect(() => {
     setIsPJ(tipoUsuario === "PJ");
   }, [tipoUsuario]);
@@ -233,7 +233,7 @@ const MyServices = () => {
                     key={item.id_servico}
                     title={item.nom_servico}
                     description={item.desc_servico}
-                    categories={[item.nom_status, item.nom_usuario]}
+                    categories={[item.nom_status, item.nom_usuario, new Date(item.dth_servico).toLocaleString("pt-BR"), item.num_tempo_estimado_st]}
                     status={item.nom_status}
                     hasActions
                     onFinished={() => handleFinalizeService(item.id_servico)}

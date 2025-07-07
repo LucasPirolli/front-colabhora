@@ -167,7 +167,7 @@ const Opportunities = () => {
                     key={item.id_servico}
                     title={item.nom_servico}
                     description={item.desc_servico}
-                    categories={[item.nom_status, item.nom_usuario]}
+                    categories={[item.nom_status, item.nom_usuario, new Date(item.dth_servico).toLocaleString("pt-BR"), item.num_tempo_estimado_st]}
                     onAccept={() => handleAcceptService(item.id_servico)}
                     acceptLoading={loadingAcceptId === item.id_servico}
                     onClick={() => handleNavigate(item)}

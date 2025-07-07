@@ -106,11 +106,11 @@ const ServiceDetails = () => {
                 <Col xs={24} sm={12}>
                   <Text strong>Data Início</Text>
                   
-                  <Paragraph type="secondary">{new Date(selectedData.dth_servico).toLocaleDateString("pt-BR")}</Paragraph>
+                  <Paragraph type="secondary">{new Date(selectedData.dth_servico).toLocaleString("pt-BR")}</Paragraph>
                 </Col>
                 <Col xs={24} sm={12}>
                   <Text strong>Data Fim</Text>
-                  <Paragraph type="secondary">{new Date(selectedData.dth_fim_servico).toLocaleDateString("pt-BR")}</Paragraph>
+                  <Paragraph type="secondary">{new Date(selectedData.dth_fim_servico).toLocaleString("pt-BR")}</Paragraph>
                 </Col>
                 <Col xs={24} sm={12}>
                   <Text strong>Endereço</Text>
@@ -118,7 +118,7 @@ const ServiceDetails = () => {
                 </Col>
                 <Col xs={24} sm={12}>
                   <Text strong>Tempo Estimado</Text>
-                  <Paragraph type="secondary">{selectedData.num_tempo_estimado}h</Paragraph>
+                  <Paragraph type="secondary">{selectedData.num_tempo_estimado_st}</Paragraph>
                 </Col>
                 <Col xs={24} sm={24}>
                   <Text strong>Descrição</Text>
