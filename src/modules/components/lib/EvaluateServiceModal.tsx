@@ -20,9 +20,6 @@ const EvaluateServiceModal = ({
 }: EvaluateServiceModalProps) => {
   const [form] = Form.useForm();
 
-  console.log('usuariosParaAvaliar', usuariosParaAvaliar);
-
-
   useEffect(() => {
     if (visible) {
       const initial = usuariosParaAvaliar.map((user) => ({

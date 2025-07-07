@@ -62,19 +62,22 @@ const ServiceCard = ({
     if (onAccept) {
       return (
         <Space>
-          <Tooltip title="Aceitar serviço">
+          <Tooltip
+            title={isLocked ? "Serviço já encerrado" : "Aceitar serviço"}
+          >
             <Button
               icon={
                 acceptLoading ? <Spin size="small" /> : <CheckCircleOutlined />
               }
               onClick={(e) => {
                 e.stopPropagation();
+                if (isLocked || acceptLoading || !onFinished) return;
                 if (!acceptLoading) {
                   onAccept?.();
                 }
               }}
               type="text"
-              style={{ color: "#52c41a" }}
+              style={{ color: "#52c41a", cursor: isLocked ? "not-allowed" : "pointer", opacity: isLocked ? 0.4 : 1 }}
               disabled={acceptLoading}
             />
           </Tooltip>
