@@ -14,6 +14,8 @@ const ServiceDetails = () => {
   const location = useLocation();
   const { selectedData } = location.state || {};
 
+  console.log('selectedData', selectedData);
+
   const cookies = new Cookies();
   const [loading, setLoading] = useState(false);
   const [hasApplied, setHasApplied] = useState(false);
@@ -102,12 +104,13 @@ const ServiceDetails = () => {
                   <Paragraph type="secondary">{selectedData.nom_status}</Paragraph>
                 </Col>
                 <Col xs={24} sm={12}>
-                  <Text strong>Data/Hora Início</Text>
-                  <Paragraph type="secondary">{selectedData.dth_servico}</Paragraph>
+                  <Text strong>Data Início</Text>
+                  
+                  <Paragraph type="secondary">{new Date(selectedData.dth_servico).toLocaleDateString("pt-BR")}</Paragraph>
                 </Col>
                 <Col xs={24} sm={12}>
-                  <Text strong>Data/Hora Fim</Text>
-                  <Paragraph type="secondary">{selectedData.dth_fim_servico}</Paragraph>
+                  <Text strong>Data Fim</Text>
+                  <Paragraph type="secondary">{new Date(selectedData.dth_fim_servico).toLocaleDateString("pt-BR")}</Paragraph>
                 </Col>
                 <Col xs={24} sm={12}>
                   <Text strong>Endereço</Text>
@@ -144,10 +147,10 @@ const ServiceDetails = () => {
           type="primary"
           size="large"
           loading={loading}
-          disabled={hasApplied}
+          disabled={hasApplied || selectedData.nom_status === "Cancelado" || selectedData.nom_status === "Finalizado"}
           onClick={handleAcceptService}
           style={{
-            background: "#3F8F56",
+            background: selectedData.nom_status === "Cancelado" || selectedData.nom_status === "Finalizado" ? "#c8c8c8" : "#3F8F56",
             width: "100%",
             maxWidth: 300,
             fontSize: "0.875rem",
@@ -155,7 +158,9 @@ const ServiceDetails = () => {
             cursor: hasApplied ? "not-allowed" : "pointer",
           }}
         >
-          {hasApplied ? "Candidatado com sucesso" : "Quero me candidatar"}
+          {hasApplied ? "Candidatado com sucesso" : selectedData.nom_status === "Cancelado" || selectedData.nom_status === "Finalizado" ?
+            "Serviço Cancelado ou Finalizado" :
+            "Quero me candidatar"}
         </Button>
       </div>
     </>

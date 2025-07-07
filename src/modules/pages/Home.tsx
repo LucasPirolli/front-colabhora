@@ -8,9 +8,40 @@ import bannerHome from "../../assets/banner-home.png";
 import bannerParceiros from "../../assets/banner-parcerios.jpg";
 
 import "../styles/pages/home.scss";
+import { Services } from "../../types/types";
+import { useEffect, useState } from "react";
+import { authFetch } from "../services/authFetch";
+import Cookies from "universal-cookie";
 
 const Home = () => {
   const navigate = useNavigate();
+  const cookies = new Cookies();
+  const userId = cookies.get("id_usuario");
+
+  const [services, setServices] = useState<Services[]>([]);
+
+  useEffect(() => {
+    const fetchServices = async () => {
+      try {
+        const response = await authFetch(`${import.meta.env.VITE_BASE_PATH}/service?id_usuario_busca=${userId}`);
+        const data = await response.json();
+        if (response.ok && data.result) {
+          const ultimos = data.result.slice(-3).reverse();
+          setServices(ultimos);
+        }
+      } catch (err) {
+        console.error("Erro ao buscar serviços:", err);
+      }
+    };
+
+    fetchServices();
+  }, [userId]);
+
+  const handleNavigate = (service: any) => {
+    navigate("/service-details", {
+      state: { selectedData: service },
+    });
+  };
 
   const destaqueFrases = [
     {
@@ -108,15 +139,59 @@ const Home = () => {
       >
         <span className="title">Nossas últimas oportunidades!</span>
         <div className="container-cards">
-          {[1, 2, 3].map((_, i) => (
+          {services.map((item, i) => (
             <motion.aside
-              key={i}
+              key={item.id_servico}
               className="card"
               initial={{ opacity: 0, scale: 0.95 }}
               whileInView={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.7, delay: i * 0.2 }}
               viewport={{ once: true }}
-            />
+              onClick={() => handleNavigate(item)}
+              style={{
+                backgroundColor: "#ffffff",
+                borderRadius: "12px",
+                padding: "20px",
+                boxShadow: "0 6px 20px rgba(0,0,0,0.08)",
+                cursor: "pointer",
+                transition: "all 0.3s",
+                border: "1px solid #e0e0e0",
+                minHeight: 180,
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "space-between",
+              }}
+              whileHover={{
+                scale: 1.02,
+                boxShadow: "0 8px 24px rgba(0,0,0,0.12)",
+              }}
+            >
+              <div>
+                <h3 style={{ color: "#3F8F56", fontWeight: 700, fontSize: "1.1rem", marginBottom: 8 }}>
+                  {item.nom_servico}
+                </h3>
+                <p style={{ color: "#555", fontSize: "0.9rem", marginBottom: 12 }}>
+                  {item.desc_servico.length > 80 ? item.desc_servico.slice(0, 80) + "..." : item.desc_servico}
+                </p>
+                <p style={{ fontSize: "0.85rem", color: "#888" }}>
+                  <strong>Por:</strong> {item.nom_usuario} <br />
+                  <strong>Status:</strong>{" "}
+                  <span style={{ color: item.nom_status === "Cancelado" ? "#d9363e" : "#3F8F56" }}>
+                    {item.nom_status}
+                  </span>
+                </p>
+              </div>
+
+              <div style={{ marginTop: 12, fontSize: "0.8rem", color: "#666" }}>
+                <span>
+                  <strong>Início:</strong> {new Date(item.dth_servico).toLocaleDateString("pt-BR")}
+                </span>
+                <br />
+                <span>
+                  <strong>Fim:</strong> {new Date(item.dth_fim_servico).toLocaleDateString("pt-BR")}
+                </span>
+              </div>
+            </motion.aside>
           ))}
         </div>
       </motion.section>

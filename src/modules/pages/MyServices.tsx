@@ -11,6 +11,7 @@ import Cookies from "universal-cookie";
 import { Services } from "../../types/types";
 import Toast from "../components/lib/toast";
 import CreateServiceModal from "../components/lib/CreateServiceModal";
+import EvaluateServiceModal from "../components/lib/EvaluateServiceModal";
 
 const MyServices = () => {
   const navigate = useNavigate();
@@ -27,6 +28,10 @@ const MyServices = () => {
 
   const [modalVisible, setModalVisible] = useState(false);
   const [isPJ, setIsPJ] = useState(false);
+
+  const [evaluationModalVisible, setEvaluationModalVisible] = useState(false);
+  const [avaliarUsuarios, setAvaliarUsuarios] = useState<any[]>([]);
+  const [idServicoAvaliado, setIdServicoAvaliado] = useState<number | null>(null);
 
 
   const filteredData = dataServices.filter((item) => {
@@ -64,30 +69,6 @@ const MyServices = () => {
     }
   };
 
-  const handleFinalizeService = async (id_servico: number) => {
-    try {
-      const endpoint = `${import.meta.env.VITE_BASE_PATH}/service/finalize`;
-
-      const response = await authFetch(endpoint, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id_servico }),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        Toast("success", "Serviço finalizado com sucesso!");
-        fetchServices();
-      } else {
-        Toast("error", data.error || "Erro ao finalizar o serviço.");
-      }
-    } catch (err) {
-      Toast("error", "Erro de conexão.");
-      console.error("Erro ao finalizar serviço:", err);
-    }
-  };
-
   const handleCancelService = async (id_servico: number) => {
     try {
       const endpoint = `${import.meta.env.VITE_BASE_PATH}/service/cancel`;
@@ -112,6 +93,56 @@ const MyServices = () => {
     }
   };
 
+  const handleFinalizeService = async (id_servico: number) => {
+    try {
+      const endpoint = `${import.meta.env.VITE_BASE_PATH}/service/finalize`;
+
+      const response = await authFetch(endpoint, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id_servico }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.result) {
+        Toast("success", "Serviço finalizado com sucesso!");
+        setIdServicoAvaliado(data.result.id_servico);
+        setAvaliarUsuarios(data.result.avaliar_usuarios || []);
+        setEvaluationModalVisible(true);
+      } else {
+        Toast("error", data.error || "Erro ao finalizar o serviço.");
+      }
+    } catch (err) {
+      Toast("error", "Erro de conexão.");
+      console.error("Erro ao finalizar serviço:", err);
+    }
+  };
+
+  const handleSubmitEvaluation = async (payload: any) => {
+    try {
+      const endpoint = `${import.meta.env.VITE_BASE_PATH}/service/rate`;
+
+      const response = await authFetch(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        Toast("success", "Avaliação enviada com sucesso!");
+        setEvaluationModalVisible(false);
+        fetchServices();
+      } else {
+        Toast("error", data.error || "Erro ao enviar avaliação.");
+      }
+    } catch (err) {
+      Toast("error", "Erro ao conectar com o servidor.");
+      console.error("Erro ao enviar avaliação:", err);
+    }
+  };
 
   const handleNavigate = (data: any) => {
     navigate("/service-details", {
@@ -121,7 +152,8 @@ const MyServices = () => {
     });
   };
 
-  const tipoUsuario = cookies.get("tipo_usuario");
+  const tipoUsuario = cookies.get("flg_tipo_usuario");
+  
   useEffect(() => {
     setIsPJ(tipoUsuario === "PJ");
   }, [tipoUsuario]);
@@ -223,6 +255,13 @@ const MyServices = () => {
           fetchServices();
         }}
         isPJ={isPJ}
+      />
+      <EvaluateServiceModal
+        visible={evaluationModalVisible}
+        onClose={() => { }}
+        onSubmit={handleSubmitEvaluation}
+        idServico={idServicoAvaliado!}
+        usuariosParaAvaliar={avaliarUsuarios}
       />
     </>
   );

@@ -85,7 +85,7 @@ const Skills = () => {
           setEditingSkill(null);
           fetchSkills();
         } else {
-          Toast("error", data.message || "Erro ao salvar habilidade.");
+          Toast("error", data.error || "Erro ao salvar habilidade.");
         }
       } catch (err) {
         Toast("error", "Erro ao conectar com o servidor.");

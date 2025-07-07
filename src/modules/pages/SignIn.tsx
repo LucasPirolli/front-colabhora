@@ -281,7 +281,8 @@ function SignIn() {
                       rules={[{ required: true, message: "Selecione o tipo" }]}
                     >
                       <Select placeholder="Selecione o tipo">
-                        <Option value="PF">Pessoa física</Option>
+                        <Option value="PF">Pessoa Física</Option>
+                        <Option value="PJ">Pessoa Jurídica</Option>
                       </Select>
                     </Form.Item>
                   </Col>

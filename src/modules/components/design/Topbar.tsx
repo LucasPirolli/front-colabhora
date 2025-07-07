@@ -65,6 +65,11 @@ const Topbar = () => {
             Oportunidades
           </a>
         )}
+        {tipoUsuario === "PJ" && (
+          <a className="link" onClick={() => navigate("/projects")}>
+            Meus Projetos
+          </a>
+        )}
         <a className="link" onClick={() => navigate("/my-services")}>
           Meus serviços
         </a>

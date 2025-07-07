@@ -1,9 +1,18 @@
 import { useState } from "react";
-import { Card, Tag, Space, Typography, Button, Spin } from "antd";
+import {
+  Card,
+  Tag,
+  Space,
+  Typography,
+  Button,
+  Spin,
+  Tooltip,
+} from "antd";
 import {
   CloseCircleOutlined,
   InfoCircleOutlined,
   CheckCircleOutlined,
+  FlagOutlined,
 } from "@ant-design/icons";
 
 const { Paragraph } = Typography;
@@ -40,27 +49,35 @@ const ServiceCard = ({
   onAccept,
   acceptLoading = false,
 }: ServiceCardProps) => {
-  const [actionLoading, setActionLoading] = useState<Record<"finalize" | "cancel", boolean>>({
+  const [actionLoading, setActionLoading] = useState<
+    Record<"finalize" | "cancel", boolean>
+  >({
     finalize: false,
     cancel: false,
   });
+
+  const isLocked = status === "Finalizado" || status === "Cancelado";
 
   const renderActions = () => {
     if (onAccept) {
       return (
         <Space>
-          <Button
-            icon={acceptLoading ? <Spin size="small" /> : <CheckCircleOutlined />}
-            onClick={(e) => {
-              e.stopPropagation();
-              if (!acceptLoading) {
-                onAccept?.();
+          <Tooltip title="Aceitar serviço">
+            <Button
+              icon={
+                acceptLoading ? <Spin size="small" /> : <CheckCircleOutlined />
               }
-            }}
-            type="text"
-            style={{ color: "#52c41a" }}
-            disabled={acceptLoading}
-          />
+              onClick={(e) => {
+                e.stopPropagation();
+                if (!acceptLoading) {
+                  onAccept?.();
+                }
+              }}
+              type="text"
+              style={{ color: "#52c41a" }}
+              disabled={acceptLoading}
+            />
+          </Tooltip>
         </Space>
       );
     }
@@ -68,23 +85,27 @@ const ServiceCard = ({
     if (isApplicationView) {
       return (
         <Space>
-          <Button
-            icon={<CloseCircleOutlined />}
-            onClick={(e) => {
-              e.stopPropagation();
-              onWithdraw?.();
-            }}
-            type="text"
-            danger
-          />
-          <Button
-            icon={<InfoCircleOutlined />}
-            onClick={(e) => {
-              e.stopPropagation();
-              onCheckStatus?.();
-            }}
-            type="text"
-          />
+          <Tooltip title="Desistir da candidatura">
+            <Button
+              icon={<CloseCircleOutlined />}
+              onClick={(e) => {
+                e.stopPropagation();
+                onWithdraw?.();
+              }}
+              type="text"
+              danger
+            />
+          </Tooltip>
+          <Tooltip title="Ver status da seleção">
+            <Button
+              icon={<InfoCircleOutlined />}
+              onClick={(e) => {
+                e.stopPropagation();
+                onCheckStatus?.();
+              }}
+              type="text"
+            />
+          </Tooltip>
         </Space>
       );
     }
@@ -92,43 +113,61 @@ const ServiceCard = ({
     if (hasActions) {
       return (
         <Space>
-          <Button
-            icon={actionLoading.finalize ? <Spin size="small" /> : <CheckCircleOutlined />}
-            onClick={async (e) => {
-              e.stopPropagation();
-              if (!actionLoading.finalize && onFinished) {
+          <Tooltip
+            title={isLocked ? "Serviço já encerrado" : "Finalizar serviço"}
+          >
+            <Button
+              icon={
+                actionLoading.finalize ? <Spin size="small" /> : <FlagOutlined />
+              }
+              onClick={async (e) => {
+                e.stopPropagation();
+                if (isLocked || actionLoading.finalize || !onFinished) return;
+
                 setActionLoading((prev) => ({ ...prev, finalize: true }));
                 try {
                   await onFinished();
                 } finally {
                   setActionLoading((prev) => ({ ...prev, finalize: false }));
                 }
+              }}
+              type="text"
+              style={{
+                color: "#3f8f56",
+                cursor: isLocked ? "not-allowed" : "pointer",
+                opacity: isLocked ? 0.4 : 1,
+              }}
+              disabled={isLocked || actionLoading.finalize}
+            />
+          </Tooltip>
+
+          <Tooltip
+            title={isLocked ? "Serviço já encerrado" : "Cancelar serviço"}
+          >
+            <Button
+              icon={
+                actionLoading.cancel ? <Spin size="small" /> : <CloseCircleOutlined />
               }
-            }}
-            type="text"
-            style={{ color: "#3f8f56" }}
-            disabled={actionLoading.finalize}
-          />
-          <Button
-            icon={actionLoading.cancel ? <Spin size="small" /> : <CloseCircleOutlined />}
-            onClick={async (e) => {
-              e.stopPropagation();
-              if (status === "Cancelado" || actionLoading.cancel || !onCancel) return;
-              setActionLoading((prev) => ({ ...prev, cancel: true }));
-              try {
-                await onCancel();
-              } finally {
-                setActionLoading((prev) => ({ ...prev, cancel: false }));
-              }
-            }}
-            type="text"
-            danger
-            disabled={status === "Cancelado" || actionLoading.cancel}
-            style={{
-              cursor: status === "Cancelado" ? "not-allowed" : "pointer",
-              opacity: status === "Cancelado" ? 0.4 : 1,
-            }}
-          />
+              onClick={async (e) => {
+                e.stopPropagation();
+                if (isLocked || actionLoading.cancel || !onCancel) return;
+
+                setActionLoading((prev) => ({ ...prev, cancel: true }));
+                try {
+                  await onCancel();
+                } finally {
+                  setActionLoading((prev) => ({ ...prev, cancel: false }));
+                }
+              }}
+              type="text"
+              danger
+              disabled={isLocked || actionLoading.cancel}
+              style={{
+                cursor: isLocked ? "not-allowed" : "pointer",
+                opacity: isLocked ? 0.4 : 1,
+              }}
+            />
+          </Tooltip>
         </Space>
       );
     }

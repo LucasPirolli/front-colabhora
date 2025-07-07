@@ -80,7 +80,7 @@ const Categories = () => {
         setIsModalOpen(false);
         fetchCategories();
       } else {
-        Toast("error", data.message || "Erro ao salvar categoria.");
+        Toast("error", data.error || "Erro ao salvar categoria.");
       }
     } catch (err) {
       Toast("error", "Erro ao conectar com o servidor.");

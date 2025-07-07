@@ -171,6 +171,7 @@ const Opportunities = () => {
                     onAccept={() => handleAcceptService(item.id_servico)}
                     acceptLoading={loadingAcceptId === item.id_servico}
                     onClick={() => handleNavigate(item)}
+                    status={item.nom_status}
                   />
 
                 ))}

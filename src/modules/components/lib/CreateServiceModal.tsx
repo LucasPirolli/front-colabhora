@@ -1,7 +1,7 @@
 // Novo componente para modal de criação de serviço
 import { Modal, Form, Input, DatePicker, Select, InputNumber, Button, Spin, Row, Col } from "antd";
 import { useEffect, useState } from "react";
-import dayjs from "dayjs";
+import locale from "antd/es/date-picker/locale/pt_BR";
 import Cookies from "universal-cookie";
 import { authFetch } from "../../services/authFetch";
 import Toast from "./toast";
@@ -27,6 +27,12 @@ const CreateServiceModal = ({ visible, onClose, onSuccess, isPJ }: {
     useEffect(() => {
         if (visible) {
             fetchDropdownData();
+        }
+    }, [visible]);
+
+    useEffect(() => {
+        if (!visible) {
+            form.resetFields();
         }
     }, [visible]);
 
@@ -64,16 +70,16 @@ const CreateServiceModal = ({ visible, onClose, onSuccess, isPJ }: {
 
         setLoading(true);
         try {
-            const payload = {
+            const payload: any = {
                 nom_servico: values.nom_servico,
                 desc_servico: values.desc_servico,
                 id_usuario_solicitante: userId,
-                id_projeto_pai: isPJ ? values.id_projeto_pai : null,
                 dth_servico: values.dth_servico.toISOString(),
                 dth_fim_servico: values.dth_fim_servico.toISOString(),
                 num_qtd_prestadores: values.num_qtd_prestadores,
                 id_habilidade_lista: values.id_habilidade_lista,
                 id_categoria_lista: values.id_categoria_lista,
+                ...(isPJ && { id_projeto_pai: values.id_projeto_pai })
             };
 
             const response = await authFetch(`${import.meta.env.VITE_BASE_PATH}/service`, {
@@ -89,7 +95,7 @@ const CreateServiceModal = ({ visible, onClose, onSuccess, isPJ }: {
                 onSuccess();
                 form.resetFields();
             } else {
-                Toast("error", data.message || "Erro ao criar serviço.");
+                Toast("error", data.error || "Erro ao criar serviço.");
             }
         } catch (err) {
             Toast("error", "Erro de conexão.");
@@ -110,13 +116,15 @@ const CreateServiceModal = ({ visible, onClose, onSuccess, isPJ }: {
             <Form layout="vertical" form={form} onFinish={handleSubmit}>
                 <Row gutter={16}>
                     <Col span={12}>
-                        <Form.Item name="nom_servico" label="Nome do Serviço" rules={[{ required: true }]}>
+                        <Form.Item name="nom_servico" label="Nome do Serviço" rules={[{ required: true, message: "Campo obrigatório" }]}
+                        >
                             <Input />
                         </Form.Item>
                     </Col>
                     <Col span={12} style={{ display: isPJ ? "block" : "none" }}>
                         {isPJ && (
-                            <Form.Item name="id_projeto_pai" label="Projeto" rules={[{ required: true }]}>
+                            <Form.Item name="id_projeto_pai" label="Projeto" rules={[{ required: true, message: "Campo obrigatório" }]}
+                            >
                                 <Select placeholder="Selecione o projeto">
                                     {projects.map((proj: any) => (
                                         <Option key={proj.id_projeto} value={proj.id_projeto}>
@@ -129,19 +137,36 @@ const CreateServiceModal = ({ visible, onClose, onSuccess, isPJ }: {
                     </Col>
                 </Row>
 
-                <Form.Item name="desc_servico" label="Descrição" rules={[{ required: true }]}>
-                    <TextArea rows={3} />
+                <Form.Item name="desc_servico" label="Descrição" rules={[{ required: true, message: "Campo obrigatório" }]}
+                >
+                    <TextArea rows={3} style={{ resize: 'none' }} />
                 </Form.Item>
 
                 <Row gutter={16}>
                     <Col span={12}>
-                        <Form.Item name="dth_servico" label="Data e Hora de Início" rules={[{ required: true }]}>
-                            <DatePicker style={{ width: "100%" }} />
+                        <Form.Item
+                            name="dth_servico"
+                            label="Data de Início"
+                            rules={[{ required: true, message: "Campo obrigatório" }]}
+                        >
+                            <DatePicker
+                                style={{ width: "100%" }}
+                                format="DD/MM/YYYY"
+                                locale={locale}
+                            />
                         </Form.Item>
                     </Col>
                     <Col span={12}>
-                        <Form.Item name="dth_fim_servico" label="Data e Hora de Fim" rules={[{ required: true }]}>
-                            <DatePicker style={{ width: "100%" }} />
+                        <Form.Item
+                            name="dth_fim_servico"
+                            label="Data de Fim"
+                            rules={[{ required: true, message: "Campo obrigatório" }]}
+                        >
+                            <DatePicker
+                                style={{ width: "100%" }}
+                                format="DD/MM/YYYY"
+                                locale={locale}
+                            />
                         </Form.Item>
                     </Col>
                 </Row>
@@ -151,7 +176,8 @@ const CreateServiceModal = ({ visible, onClose, onSuccess, isPJ }: {
                         <Form.Item
                             name="num_qtd_prestadores"
                             label="Quantidade de Prestadores"
-                            rules={[{ required: true }]}
+                            rules={[{ required: true, message: "Campo obrigatório" }]}
+
                         >
                             <InputNumber min={1} style={{ width: "100%" }} />
                         </Form.Item>
@@ -160,7 +186,8 @@ const CreateServiceModal = ({ visible, onClose, onSuccess, isPJ }: {
                         <Form.Item
                             name="id_categoria_lista"
                             label="Categorias"
-                            rules={[{ required: true }]}
+                            rules={[{ required: true, message: "Campo obrigatório" }]}
+
                         >
                             <Select mode="multiple" placeholder="Selecione as categorias">
                                 {categories.map((c: any) => (
@@ -176,7 +203,8 @@ const CreateServiceModal = ({ visible, onClose, onSuccess, isPJ }: {
                 <Form.Item
                     name="id_habilidade_lista"
                     label="Habilidades"
-                    rules={[{ required: true }]}
+                    rules={[{ required: true, message: "Campo obrigatório" }]}
+
                 >
                     <Select mode="multiple" placeholder="Selecione as habilidades">
                         {skills.map((s: any) => (

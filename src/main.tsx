@@ -11,6 +11,7 @@ import MyServices from "./modules/pages/MyServices.tsx";
 import Opportunities from "./modules/pages/Opportunities.tsx";
 import ServiceDetails from "./modules/pages/ServiceDetails.tsx";
 import Applications from "./modules/pages/Applications.tsx";
+import Projects from "./modules/pages/Projects.tsx";
 
 import Profile from "./modules/pages/Profile.tsx";
 
@@ -32,6 +33,7 @@ const Main = () => {
         <Route path="/opportunities" element={<Opportunities />} />
         <Route path="/service-details" element={<ServiceDetails />} />
         <Route path="/applications" element={<Applications />} />
+        <Route path="/projects" element={<Projects />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/adm-skills" element={<Skills />} />
         <Route path="/adm-categories" element={<Categories />} />
